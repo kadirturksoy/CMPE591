@@ -1,4 +1,4 @@
-function [steering_th,speed] = vehicle_controller( target,scan_msg,speed_min,speed_max,fs_dist,stop_dist,stop_fov,median_filter_size)
+function [steering_th,speed] = vehicle_controller(trajectory,step_size,crash_th,target,scan_msg,speed_min,speed_max,fs_dist,stop_dist,stop_fov,median_filter_size)
 
     steering_th = atan2(target(2),target(1));
     speed = max(speed_min,speed_max*cos(steering_th));
@@ -24,15 +24,32 @@ function [steering_th,speed] = vehicle_controller( target,scan_msg,speed_min,spe
             continue;
         end
         
-        if(scan(i) < min_scan)
-            min_scan = scan(i);
+        
+        i_th = angle_min+angle_inc*i;
+        i_dist = scan(i) * cos(i_th);
+        
+        if(i_dist < min_scan)
+            crash = 0;
+            
+            % check dist on the trajectory
+            
+            for j=1:round(fs_dist/step_size)
+                if norm(trajectory(j,:) - scan(i)*[cos(i_th) sin(i_th)]) < crash_th
+                    crash = 1;
+                    break;
+                end
+                
+            end
+            if crash
+                min_scan = i_dist;
+            end
         end
         
     end
     
-    min_scan;
+    min_scan
     
-    speed = min(speed,max(0,speed*(min_scan-stop_dist)/(fs_dist-stop_dist)));
+    speed = min(speed,max(0,speed*(min_scan-stop_dist)/(fs_dist-stop_dist)))
     
 
 end

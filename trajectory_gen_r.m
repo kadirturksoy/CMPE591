@@ -1,4 +1,4 @@
-function [ trajectory ] = trajectory_gen_r( obs_list,g1,g2,step_size)
+function [ trajectory ] = trajectory_gen_r( obs_list,g1,g2,step_size,plot)
 %trajectory_gen_r Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -6,11 +6,14 @@ function [ trajectory ] = trajectory_gen_r( obs_list,g1,g2,step_size)
 
 % figure;
 
+if plot
 
+    hold on;
 
-hold on;
+    plot(obs_list(:,1),obs_list(:,2),'ro');
+    
+end
 
-plot(obs_list(:,1),obs_list(:,2),'ro');
 
 x = 0:step_size:20;
 
@@ -32,20 +35,21 @@ c0 = [0 0 0 0];
 
 ci = nlparci(c,r,'Jacobian',J);
 
-plot(x,ypred1,'Color',[0.5 0 0]);
-plot(x,ypred1+delta1,'Color',[0.5 0 0],'LineStyle',':');
-plot(x,ypred1-delta1,'Color',[0.5 0 0],'LineStyle',':');
+if plot
+    plot(x,ypred1,'Color',[0.5 0 0]);
+    plot(x,ypred1+delta1,'Color',[0.5 0 0],'LineStyle',':');
+    plot(x,ypred1-delta1,'Color',[0.5 0 0],'LineStyle',':');
 
-plot(x,ypred2,'Color',[0.5 0 0]);
-plot(x,ypred2+delta2,'Color',[0.5 0 0],'LineStyle',':');
-plot(x,ypred2-delta2,'Color',[0.5 0 0],'LineStyle',':');
+    plot(x,ypred2,'Color',[0.5 0 0]);
+    plot(x,ypred2+delta2,'Color',[0.5 0 0],'LineStyle',':');
+    plot(x,ypred2-delta2,'Color',[0.5 0 0],'LineStyle',':');
 
-plot(x,0.5*(ypred1+ypred2),'Color',[0 0.5 0]);
+    plot(x,0.5*(ypred1+ypred2),'Color',[0 0.5 0]);
+
+    hold off;
+end
 
 trajectory = [x; (ypred1+ypred2)/2]';
-
-
-hold off;
 
 
 end

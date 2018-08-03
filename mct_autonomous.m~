@@ -1,9 +1,5 @@
 %laser = rossubscriber('/scan');
 
-plot = 0;
-
-warning('off','all')
-
 
 steerPub = rospublisher('/Steering', 'std_msgs/Float32');
 speedPub = rospublisher('/Speed', 'std_msgs/Float32');
@@ -42,7 +38,8 @@ stop_fov = pi/3;
 median_filter_size = 21;
 crash_th = 0.5;
 
-steer_max = 0.35;
+jaguar_vmax = 30/3.6;
+jaguar_wmax = 0.35;
 
 % kobuki parameter
 
@@ -137,14 +134,14 @@ while 1
 %     toc
     
     if init==0
-        obs_list = obs_gen(scan_msg,median_filter_size,plot);
+        obs_list = obs_gen(scan_msg,median_filter_size);
         [g1,g2] = obs_filter(obs_list);
         init = 1;
     else
         prev_obs_list = obs_list;
         prev_g1 = g1;
         prev_g2 = g2;
-        obs_list = obs_gen(scan_msg,median_filter_size,plot);
+        obs_list = obs_gen(scan_msg,median_filter_size);
         [g1,g2] = obs_filter(obs_list);
     end
       
@@ -171,24 +168,19 @@ while 1
     
     
     
-    trajectory = trajectory_gen_r(obs_list,g1,g2,step_size,plot);
+    trajectory = trajectory_gen_r(obs_list,g1,g2,step_size);
     
     toc
     
      
     target = trajectory(1+look_ahead/step_size,:);
     
+    hold on;
+
+    plot(target(1),target(2),'rx');
+
+    hold off;
     
-    if plot
-        
-        hold on;
-
-        plot(target(1),target(2),'rx');
-
-        hold off;
-        
-    end
-
     [steering_th,speed] = vehicle_controller(trajectory,step_size,crash_th,target,scan_msg,speed_min,speed_max,fs_dist,stop_dist,stop_fov,median_filter_size);
     
     steering_th;
@@ -205,17 +197,15 @@ while 1
 %     
 %     send(kobukiPub,kobuki_msg);    
     
-    jaguar_msg.Linear.X = speed;
-    jaguar_msg.Angular.Z = steer_max*sin(steering_th);
+    jaguar_msg.Linear.X = jaguar_vmax*speed/speed_max;
+    jaguar_msg.Angular.Z = jaguar_wmax*sin(steering_th);
     
     jaguar_msg.Linear.X;
     jaguar_msg.Angular.Z;
     
-    send(jaguarPub,jaguar_msg);
+     send(jaguarPub,jaguar_msg);
     
-    pause(0.01)
-    
-    toc
+    pause(0.1)
     
     %break;
     

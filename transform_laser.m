@@ -30,7 +30,7 @@ y = cart_mat(2,:);
 
 % back to polar
 
-out = 6*ones(size(output_msg.Ranges));
+out = 20*ones(size(output_msg.Ranges));
 
 idx = round((atan2(y,x)-output_msg.AngleMin)./output_msg.AngleIncrement)+1;
 

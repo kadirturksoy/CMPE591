@@ -1,4 +1,4 @@
-function [obs_list] = obs_gen(scan_msg,median_filter_size)
+function [obs_list] = obs_gen(scan_msg,median_filter_size, plot)
 %OBS_GEN Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -10,10 +10,10 @@ scan_size = size(scan_msg.Ranges,1);
 
 dc_th = 0.5;
 min_dist_th = 0.8;
-max_dist_th = 1.2;
+max_dist_th = 2.2;
 
-min_rad = 0.1;
-max_rad = 0.3;
+min_rad = 0.05;
+max_rad = 0.4;
 
 
 i=2;
@@ -112,12 +112,14 @@ obs_list = tmp_list;
 % 
 
 th = scan_msg.AngleMin:scan_msg.AngleIncrement:scan_msg.AngleMax;
-
-polar(th',scan);
-hold on;
+if plot
+    polar(th',scan);
+    hold on;
 % obs_list
 % plot(obs_list(:,1),obs_list(:,2),'ro');
 % hold off;
+
+end
 
 
 
