@@ -16,7 +16,13 @@ min_rad = 0.05;
 max_rad = 0.4;
 
 
-i=2;
+% close filter
+for i=1:scan_size
+    if scan(i) < 0.2
+        scan(i) = 30;
+    end
+end
+
 
 % median filtering
 
@@ -24,6 +30,9 @@ scan = medfilt1(scan,median_filter_size);
 
 obs_list = [];
 pt_list = [];
+
+
+i=2;
 
 while i<scan_size
     
