@@ -46,10 +46,8 @@ function [steering_th,speed] = vehicle_controller(trajectory,step_size,crash_th,
         end
         
     end
-    
-    min_scan
-    
-    speed = min(speed,max(0,speed*(min_scan-stop_dist)/(fs_dist-stop_dist)))
+        
+    speed = min(speed,max(0,speed*(min_scan-stop_dist)/(fs_dist-stop_dist)));
     
 
 end

@@ -1,12 +1,20 @@
 %laser = rossubscriber('/scan');
 
-plot = 0;
+plot_flag = 1;
+self_odom = 1;
+
+
 
 warning('off','all')
 
-
 steerPub = rospublisher('/Steering', 'std_msgs/Float32');
 speedPub = rospublisher('/Speed', 'std_msgs/Float32');
+
+if(self_odom)
+   odomPub = rospublisher('/odom', 'nav_msgs/Odometry');
+   odom_msg = rosmessage(odomPub);
+   send(odomPub,odom_msg);
+end
 
 % jaguar
 % jaguarPub = rospublisher('/drrobot_player1/drrobot_cmd_vel', 'geometry_msgs/Twist');
@@ -28,18 +36,18 @@ steer_msg = rosmessage(steerPub);
 speed_msg = rosmessage(speedPub);
 
 scanSub = rossubscriber('/autonomous_car/laser/scan',@laserCallback);
-%odomSub = rossubscriber('/odom');
+odomSub = rossubscriber('/odom');
 
 steering_th = 0;
 speed = 0;
 speed_max = 30/3.6;
 speed_min = 5/3.6;
-look_ahead = 2;
+look_ahead = 10;
 step_size = 0.1;
 fs_dist = 7;
 stop_dist = 0.5;
 stop_fov = pi/3;
-median_filter_size = 21;
+median_filter_size = 11;
 crash_th = 0.5;
 
 steer_max = 0.35;
@@ -53,11 +61,12 @@ steer_msg.Data = steering_th;
 speed_msg.Data = speed;
 
 % scan = scan_1;
+load('scan_list.mat');
 scan = scan_list(1,:);
 
 
 pause(1);
-%scan_msg = scanSub.LatestMessage;
+% scan_msg = scanSub.LatestMessage;
 
 scan_msg = rosmessage('sensor_msgs/LaserScan');
 
@@ -137,14 +146,14 @@ while 1
 %     toc
     
     if init==0
-        obs_list = obs_gen(scan_msg,median_filter_size,plot);
+        obs_list = obs_gen(scan_msg,median_filter_size,plot_flag);
         [g1,g2] = obs_filter(obs_list);
         init = 1;
     else
         prev_obs_list = obs_list;
         prev_g1 = g1;
         prev_g2 = g2;
-        obs_list = obs_gen(scan_msg,median_filter_size,plot);
+        obs_list = obs_gen(scan_msg,median_filter_size,plot_flag);
         [g1,g2] = obs_filter(obs_list);
     end
       
@@ -171,7 +180,7 @@ while 1
     
     
     
-    trajectory = trajectory_gen_r(obs_list,g1,g2,step_size,plot);
+    trajectory = trajectory_gen_r(obs_list,g1,g2,step_size,plot_flag);
     
     toc
     
@@ -179,7 +188,7 @@ while 1
     target = trajectory(1+look_ahead/step_size,:);
     
     
-    if plot
+    if plot_flag
         
         hold on;
 

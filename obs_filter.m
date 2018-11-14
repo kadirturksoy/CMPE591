@@ -2,6 +2,9 @@ function [ g1,g2 ] = obs_filter( obs_list )
 %obs_filter Summary of this function goes here
 %   Detailed explanation goes here
 
+min_dist_th = 0.7;
+max_dist_th = 1.5;
+
 % grouping
 
 g1 = [];
@@ -42,7 +45,7 @@ while i<size(g1,1)+1
         if (~is_assigned(j))
             dist = norm(obs_list(c_idx,1:2) - obs_list(j,1:2));
             
-            if(dist>0.8 && dist < 1.2)
+            if(dist>min_dist_th && dist < max_dist_th)
                 g1 = [g1;j];
                 is_assigned(j) = 1;
             end

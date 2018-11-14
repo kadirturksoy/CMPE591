@@ -1,4 +1,4 @@
-function [ trajectory ] = trajectory_gen_r( obs_list,g1,g2,step_size,plot)
+function [ trajectory ] = trajectory_gen_r( obs_list,g1,g2,step_size,plot_flag)
 %trajectory_gen_r Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -6,7 +6,7 @@ function [ trajectory ] = trajectory_gen_r( obs_list,g1,g2,step_size,plot)
 
 % figure;
 
-if plot
+if plot_flag
 
     hold on;
 
@@ -35,7 +35,7 @@ c0 = [0 0 0 0];
 
 ci = nlparci(c,r,'Jacobian',J);
 
-if plot
+if plot_flag
     plot(x,ypred1,'Color',[0.5 0 0]);
     plot(x,ypred1+delta1,'Color',[0.5 0 0],'LineStyle',':');
     plot(x,ypred1-delta1,'Color',[0.5 0 0],'LineStyle',':');
