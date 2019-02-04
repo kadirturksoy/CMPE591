@@ -1,6 +1,6 @@
 %laser = rossubscriber('/scan');
 
-plot_flag = 1;
+plot_flag = 0;
 self_odom = 1;
 
 
